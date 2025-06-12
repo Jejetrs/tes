@@ -25,90 +25,90 @@ Pada tahap ini, dilakukan beberapa langkah penting untuk menyiapkan dataset sebe
 
 1. Over sampling
 
-Oversampling dilakukan untuk menyamakan jumlah gambar di setiap kelas. Dalam konteks ini, setiap kelas ditargetkan memiliki 300 gambar. Teknik ini sangat penting untuk mencegah model bias terhadap kelas dengan jumlah data terbanyak, dan memastikan model dapat belajar secara adil dari semua kelas.
-
-Langkah-langkah yang dilakukan:
-- Menyalin seluruh gambar asli dari direktori EXTRACTED_PATH ke direktori AUGMENTED_PATH.
-- Jika jumlah gambar asli dalam suatu kelas < 300, maka dilakukan augmentasi sederhana, yaitu dengan Gaussian Blur.
-- Gambar hasil augmentasi disimpan dengan nama os_{i}.jpg.
-
- ```python
-AUGMENTED_PATH = '/content/Dataset_Skin_Type/overSampling_dataset'
-IMAGES_PER_CLASS = 300
-TARGET_SIZE = (224, 224)
-
-def get_class_transformations(cls):
-    return [lambda img: cv2.GaussianBlur(img, (3, 3), 0)]
-
-def oversample_class(cls, src, dst, images, total_original, target_count=IMAGES_PER_CLASS):
-    ...
-    for i in tqdm(range(target_count - total_original), desc=f"Oversampling {cls}"):
-        ...
-        transform = random.choice(transformation_pool)
-        img_rgb = transform(img_rgb)
-        ...
-def augment_and_oversample():
-  ...
- ```
+ Oversampling dilakukan untuk menyamakan jumlah gambar di setiap kelas. Dalam konteks ini, setiap kelas ditargetkan memiliki 300 gambar. Teknik ini sangat  penting untuk mencegah model bias terhadap kelas dengan jumlah data terbanyak, dan memastikan model dapat belajar secara adil dari semua kelas.
+ 
+ Langkah-langkah yang dilakukan:
+ - Menyalin seluruh gambar asli dari direktori EXTRACTED_PATH ke direktori AUGMENTED_PATH.
+ - Jika jumlah gambar asli dalam suatu kelas < 300, maka dilakukan augmentasi sederhana, yaitu dengan Gaussian Blur.
+ - Gambar hasil augmentasi disimpan dengan nama os_{i}.jpg.
+ 
+  ```python
+ AUGMENTED_PATH = '/content/Dataset_Skin_Type/overSampling_dataset'
+ IMAGES_PER_CLASS = 300
+ TARGET_SIZE = (224, 224)
+ 
+ def get_class_transformations(cls):
+     return [lambda img: cv2.GaussianBlur(img, (3, 3), 0)]
+ 
+ def oversample_class(cls, src, dst, images, total_original, target_count=IMAGES_PER_CLASS):
+     ...
+     for i in tqdm(range(target_count - total_original), desc=f"Oversampling {cls}"):
+         ...
+         transform = random.choice(transformation_pool)
+         img_rgb = transform(img_rgb)
+         ...
+ def augment_and_oversample():
+   ...
+  ```
 
 2. Split Data
 
-Setelah oversampling selesai, seluruh data dibagi menjadi dua bagian:
-- 80% untuk data pelatihan (train)
-- 20% untuk data validasi (validation)
-
-Pembagian dilakukan secara acak namun tetap mempertahankan distribusi kelas dengan adil. Data hasil pembagian disimpan dalam direktori split_dataset.
-
- ```python
-SPLIT_PATH = '/content/Dataset_Skin_Type/split_dataset'
-TRAIN_SPLIT = os.path.join(SPLIT_PATH, 'train')
-VALID_SPLIT = os.path.join(SPLIT_PATH, 'validation')
-
-val_ratio = 0.2
-
-for cls in classes:
-    ...
-    train_files, valid_files = train_test_split(all_files, test_size=val_ratio, random_state=42, shuffle=True)
-    ...
-
- ```
+ Setelah oversampling selesai, seluruh data dibagi menjadi dua bagian:
+ - 80% untuk data pelatihan (train)
+ - 20% untuk data validasi (validation)
+ 
+ Pembagian dilakukan secara acak namun tetap mempertahankan distribusi kelas dengan adil. Data hasil pembagian disimpan dalam direktori split_dataset.
+ 
+  ```python
+ SPLIT_PATH = '/content/Dataset_Skin_Type/split_dataset'
+ TRAIN_SPLIT = os.path.join(SPLIT_PATH, 'train')
+ VALID_SPLIT = os.path.join(SPLIT_PATH, 'validation')
+ 
+ val_ratio = 0.2
+ 
+ for cls in classes:
+     ...
+     train_files, valid_files = train_test_split(all_files, test_size=val_ratio, random_state=42, shuffle=True)
+     ...
+ 
+  ```
 3. Image Data Generator - Augmentasi
 
-Pada tahap ini, dilakukan proses augmentasi data menggunakan generator khusus bernama RGBGrayGenerator, yang merupakan custom data generator berbasis Keras Sequence. Tujuan utama dari pendekatan ini adalah untuk menggabungkan informasi warna (RGB) dan tekstur pencahayaan (Grayscale) dari gambar kulit dalam satu format input, sehingga model CNN dapat belajar dari dua aspek penting dalam klasifikasi tipe kulit: warna dan tekstur.
-
-Pada umumnya, model CNN hanya menerima input gambar berformat RGB (3-channel). Namun, dalam konteks klasifikasi jenis kulit ini, informasi visual dari tekstur seperti kerutan, pori-pori, garis halus, dan ketidakteraturan permukaan kulit sering kali lebih penting dibanding warna semata.
-
-Dengan menggabungkan channel grayscale ke dalam input gambar, model memperoleh kontras dan perbedaan intensitas piksel yang lebih tajam, yang membantu meningkatkan akurasi dalam membedakan pola-pola halus antar jenis kulit.
-
-![rgb_scale](https://github.com/user-attachments/assets/9b559474-8a23-4d87-b5f1-8f43c11065b3)
-
-**Cara Kerja Generator**
-
-RGBGrayGenerator bekerja dalam beberapa langkah:
-- Membaca direktori dataset (train/validation) dan memuat semua gambar per kelas.
-- Setiap gambar diubah dari BGR ke RGB.
-- Gambar RGB dikonversi menjadi Grayscale.
-- Channel grayscale kemudian ditambahkan sebagai channel keempat pada gambar.
-- Gambar dikonversi menjadi array berukuran (height, width, 4) dan dinormalisasi ke rentang [0, 1].
-- Label dikonversi menjadi one-hot encoding.
-
-**Informasi yang akan didapat Model**
-
-| Kanal     | Deskripsi                                                |
-| --------- | -------------------------------------------------------- |
-| RGB       | Informasi warna dan pigmentasi kulit                     |
-| Grayscale | Menyoroti tekstur: kerutan, pori-pori, anomali permukaan |
-
-
-Dengan gabungan ini, CNN akan memiliki pemahaman visual yang lebih kaya dan mendalam, sehingga lebih mampu membedakan antar tipe kulit yang mirip dari segi warna, tetapi berbeda dari segi tekstur.
-
-
- ```python
-train_generator = RGBGrayGenerator(train_dir, batch_size=32, target_size=(224, 224))
-validation_generator = RGBGrayGenerator(val_dir, batch_size=32, target_size=(224, 224), shuffle_data=False)
-
- ```
-Di sini, train_generator dan validation_generator akan menyediakan batch berukuran (batch_size, 224, 224, 4) yang sudah siap digunakan dalam proses pelatihan CNN.
+  Pada tahap ini, dilakukan proses augmentasi data menggunakan generator khusus bernama RGBGrayGenerator, yang merupakan custom data generator berbasis Keras Sequence. Tujuan utama dari pendekatan ini adalah untuk menggabungkan informasi warna (RGB) dan tekstur pencahayaan (Grayscale) dari gambar kulit dalam satu format input, sehingga model CNN dapat belajar dari dua aspek penting dalam klasifikasi tipe kulit: warna dan tekstur.
+  
+  Pada umumnya, model CNN hanya menerima input gambar berformat RGB (3-channel). Namun, dalam konteks klasifikasi jenis kulit ini, informasi visual dari tekstur seperti kerutan, pori-pori, garis halus, dan ketidakteraturan permukaan kulit sering kali lebih penting dibanding warna semata.
+  
+  Dengan menggabungkan channel grayscale ke dalam input gambar, model memperoleh kontras dan perbedaan intensitas piksel yang lebih tajam, yang membantu meningkatkan akurasi dalam membedakan pola-pola halus antar jenis kulit.
+  
+  ![rgb_scale](https://github.com/user-attachments/assets/9b559474-8a23-4d87-b5f1-8f43c11065b3)
+  
+  **Cara Kerja Generator**
+  
+  RGBGrayGenerator bekerja dalam beberapa langkah:
+  - Membaca direktori dataset (train/validation) dan memuat semua gambar per kelas.
+  - Setiap gambar diubah dari BGR ke RGB.
+  - Gambar RGB dikonversi menjadi Grayscale.
+  - Channel grayscale kemudian ditambahkan sebagai channel keempat pada gambar.
+  - Gambar dikonversi menjadi array berukuran (height, width, 4) dan dinormalisasi ke rentang [0, 1].
+  - Label dikonversi menjadi one-hot encoding.
+  
+  **Informasi yang akan didapat Model**
+  
+  | Kanal     | Deskripsi                                                |
+  | --------- | -------------------------------------------------------- |
+  | RGB       | Informasi warna dan pigmentasi kulit                     |
+  | Grayscale | Menyoroti tekstur: kerutan, pori-pori, anomali permukaan |
+  
+  
+  Dengan gabungan ini, CNN akan memiliki pemahaman visual yang lebih kaya dan mendalam, sehingga lebih mampu membedakan antar tipe kulit yang mirip dari segi warna, tetapi berbeda dari segi tekstur.
+  
+  
+   ```python
+  train_generator = RGBGrayGenerator(train_dir, batch_size=32, target_size=(224, 224))
+  validation_generator = RGBGrayGenerator(val_dir, batch_size=32, target_size=(224, 224), shuffle_data=False)
+  
+   ```
+  Di sini, train_generator dan validation_generator akan menyediakan batch berukuran (batch_size, 224, 224, 4) yang sudah siap digunakan dalam proses pelatihan CNN.
 
 ## 🧠 Model
 
@@ -143,50 +143,50 @@ Di sini, train_generator dan validation_generator akan menyediakan batch berukur
 
     1. Preprocessing Input
     
-      Input gambar berukuran `(224, 224, 4)` adalah hasil penggabungan channel RGB dan grayscale melalui custom generator `RGBGrayGenerator`. Tujuannya untuk meningkatkan akurasi dengan mempertimbangkan informasi warna dan tekstur kulit.
-
-      ```python
-      Conv2D(32, (3, 3), input_shape=(224, 224, 4)),
-      ```
+       Input gambar berukuran `(224, 224, 4)` adalah hasil penggabungan channel RGB dan grayscale melalui custom generator `RGBGrayGenerator`. Tujuannya untuk meningkatkan akurasi dengan mempertimbangkan informasi warna dan tekstur kulit.
+ 
+       ```python
+       Conv2D(32, (3, 3), input_shape=(224, 224, 4)),
+       ```
 
     2. Penanganan Imbalance Data
-      Dataset memiliki distribusi jumlah gambar yang tidak seimbang antar kelas. Untuk mengatasi hal ini, digunakan pendekatan `class_weight` dari Scikit-Learn. Weight ini akan diberikan saat pelatihan untuk menyeimbangkan kontribusi tiap kelas.
-
-      ```python
-      from sklearn.utils.class_weight import compute_class_weight
-      labels = train_generator.classes
-      unique_classes = np.unique(labels)
-      class_weights = compute_class_weight(class_weight='balanced', classes=unique_classes, y=labels)
-      class_weight_dict = dict(zip(unique_classes, class_weights))
-      ```
+       Dataset memiliki distribusi jumlah gambar yang tidak seimbang antar kelas. Untuk mengatasi hal ini, digunakan pendekatan `class_weight` dari Scikit-Learn. Weight ini akan diberikan saat pelatihan untuk menyeimbangkan kontribusi tiap kelas.
+ 
+       ```python
+       from sklearn.utils.class_weight import compute_class_weight
+       labels = train_generator.classes
+       unique_classes = np.unique(labels)
+       class_weights = compute_class_weight(class_weight='balanced', classes=unique_classes, y=labels)
+       class_weight_dict = dict(zip(unique_classes, class_weights))
+       ```
     3. Kompilasi
-      Model dikompilasi dengan konfigurasi:
-      - Optimizer: Adam dengan learning_rate=1e-3
-      - Loss Function: categorical_crossentropy
-      - Metrics: accuracy
+       Model dikompilasi dengan konfigurasi:
+       - Optimizer: Adam dengan learning_rate=1e-3
+       - Loss Function: categorical_crossentropy
+       - Metrics: accuracy
 
     4. Early Stopping
-      Untuk mencegah overfitting, digunakan teknik early stopping dengan memantau val_loss. Jika tidak ada perbaikan selama 5 epoch berturut-turut, maka training akan dihentikan dan bobot terbaik digunakan.
-
-      ```python
-      early_stop = EarlyStopping(
-          monitor='val_loss',
-          patience=5,
-          restore_best_weights=True
-      )
-      ```
-    5. Proses Pelatihan
-      Model dilatih menggunakan data dari train_generator dan divalidasi menggunakan validation_generator dengan:
-
+       Untuk mencegah overfitting, digunakan teknik early stopping dengan memantau val_loss. Jika tidak ada perbaikan selama 5 epoch berturut-turut, maka training akan dihentikan dan bobot terbaik digunakan.
+ 
        ```python
-      history = model.fit(
-          train_generator,
-          validation_data=validation_generator,
-          epochs=30,
-          callbacks=[early_stop],
-          class_weight=class_weight_dict
-      )
-      ```
+       early_stop = EarlyStopping(
+           monitor='val_loss',
+           patience=5,
+           restore_best_weights=True
+       )
+       ```
+    5. Proses Pelatihan
+       Model dilatih menggunakan data dari train_generator dan divalidasi menggunakan validation_generator dengan:
+ 
+       ```python
+       history = model.fit(
+           train_generator,
+           validation_data=validation_generator,
+           epochs=30,
+           callbacks=[early_stop],
+           class_weight=class_weight_dict
+       )
+       ```
 
 ## Evaluasi
 
@@ -233,35 +233,35 @@ Dengan kombinasi metrik tersebut, evaluasi model menjadi lebih komprehensif, ber
 
 **Hasil Evaluasi Model**
 - Akurasi
-| Dataset    | Akurasi   |
-|------------|-----------|
-| Pelatihan  | 99.58%    |
-| Validasi   | 98.33%    |
-| Pengujian  | 98.33%    |
+ | Dataset    | Akurasi   |
+ |------------|-----------|
+ | Pelatihan  | 99.58%    |
+ | Validasi   | 98.33%    |
+ | Pengujian  | 98.33%    |
 
 - Grafik akurasi
   
-![grafik_akurasi](https://github.com/user-attachments/assets/72de68c3-8fa3-42eb-bf73-f7803268794b)
+ ![grafik_akurasi](https://github.com/user-attachments/assets/72de68c3-8fa3-42eb-bf73-f7803268794b)
 
 - grafik loss
   
-![grafik_loss](https://github.com/user-attachments/assets/edc69b7c-d4cd-4845-a67f-de29bf6e6114)
+ ![grafik_loss](https://github.com/user-attachments/assets/edc69b7c-d4cd-4845-a67f-de29bf6e6114)
 
 - Classification Report
 
-| Kelas              | Precision | Recall | F1-Score | Support |
-|--------------------|-----------|--------|----------|---------|
-| Dry                | 0.98      | 1.00   | 0.99     | 60      |
-| Normal             | 0.97      | 1.00   | 0.98     | 60      |
-| Oily               | 1.00      | 0.95   | 0.97     | 60      |
-| **Akurasi**        |           |        | **0.98** | 180     |
-| **Rata-rata Macro**| 0.98      | 0.98   | 0.98     | 180     |
-| **Rata-rata Weighted** | 0.98  | 0.98   | 0.98     | 180     |
+ | Kelas              | Precision | Recall | F1-Score | Support |
+ |--------------------|-----------|--------|----------|---------|
+ | Dry                | 0.98      | 1.00   | 0.99     | 60      |
+ | Normal             | 0.97      | 1.00   | 0.98     | 60      |
+ | Oily               | 1.00      | 0.95   | 0.97     | 60      |
+ | **Akurasi**        |           |        | **0.98** | 180     |
+ | **Rata-rata Macro**| 0.98      | 0.98   | 0.98     | 180     |
+ | **Rata-rata Weighted** | 0.98  | 0.98   | 0.98     | 180     |
 
 
 - Confussion matrik
   
-![confussion_matrik](https://github.com/user-attachments/assets/fa22d81d-f4a1-4d9d-81a3-8de84fd565ae)
+ ![confussion_matrik](https://github.com/user-attachments/assets/fa22d81d-f4a1-4d9d-81a3-8de84fd565ae)
 
 **Intepretasi**
 - Akurasi tinggi secara konsisten menunjukkan proses pelatihan yang sukses dan minim overfitting.
