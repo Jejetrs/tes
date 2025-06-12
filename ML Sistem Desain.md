@@ -233,6 +233,7 @@ Dengan kombinasi metrik tersebut, evaluasi model menjadi lebih komprehensif, ber
 
 **Hasil Evaluasi Model**
 - Akurasi
+  
  | Dataset    | Akurasi   |
  |------------|-----------|
  | Pelatihan  | 99.58%    |
@@ -241,11 +242,11 @@ Dengan kombinasi metrik tersebut, evaluasi model menjadi lebih komprehensif, ber
 
 - Grafik akurasi
   
- ![grafik_akurasi](https://github.com/user-attachments/assets/72de68c3-8fa3-42eb-bf73-f7803268794b)
+  ![grafik_akurasi](https://github.com/user-attachments/assets/72de68c3-8fa3-42eb-bf73-f7803268794b)
 
 - grafik loss
   
- ![grafik_loss](https://github.com/user-attachments/assets/edc69b7c-d4cd-4845-a67f-de29bf6e6114)
+  ![grafik_loss](https://github.com/user-attachments/assets/edc69b7c-d4cd-4845-a67f-de29bf6e6114)
 
 - Classification Report
 
