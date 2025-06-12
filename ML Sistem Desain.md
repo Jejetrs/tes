@@ -80,7 +80,7 @@ Pada umumnya, model CNN hanya menerima input gambar berformat RGB (3-channel). N
 
 Dengan menggabungkan channel grayscale ke dalam input gambar, model memperoleh kontras dan perbedaan intensitas piksel yang lebih tajam, yang membantu meningkatkan akurasi dalam membedakan pola-pola halus antar jenis kulit.
 
-![greyscale](image.png)
+![rgb_scale](https://github.com/user-attachments/assets/9b559474-8a23-4d87-b5f1-8f43c11065b3)
 
 **Cara Kerja Generator**
 
@@ -240,11 +240,10 @@ Dengan kombinasi metrik tersebut, evaluasi model menjadi lebih komprehensif, ber
 | Pengujian  | 98.33%    |
 
 - Grafik akurasi
-![Akurasi Selama Training](image-1.png)
-
+![grafik_akurasi](https://github.com/user-attachments/assets/72de68c3-8fa3-42eb-bf73-f7803268794b)
 
 - grafik loss
-![Loss Selama Training](image-2.png)
+![grafik_loss](https://github.com/user-attachments/assets/edc69b7c-d4cd-4845-a67f-de29bf6e6114)
 
 - Classification Report
 
@@ -259,7 +258,7 @@ Dengan kombinasi metrik tersebut, evaluasi model menjadi lebih komprehensif, ber
 
 
 - Confussion matrik
-![confussion matrik](image-3.png)
+![confussion_matrik](https://github.com/user-attachments/assets/fa22d81d-f4a1-4d9d-81a3-8de84fd565ae)
 
 **Intepretasi**
 - Akurasi tinggi secara konsisten menunjukkan proses pelatihan yang sukses dan minim overfitting.
