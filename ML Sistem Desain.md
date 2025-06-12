@@ -240,9 +240,11 @@ Dengan kombinasi metrik tersebut, evaluasi model menjadi lebih komprehensif, ber
 | Pengujian  | 98.33%    |
 
 - Grafik akurasi
+  
 ![grafik_akurasi](https://github.com/user-attachments/assets/72de68c3-8fa3-42eb-bf73-f7803268794b)
 
 - grafik loss
+  
 ![grafik_loss](https://github.com/user-attachments/assets/edc69b7c-d4cd-4845-a67f-de29bf6e6114)
 
 - Classification Report
@@ -258,6 +260,7 @@ Dengan kombinasi metrik tersebut, evaluasi model menjadi lebih komprehensif, ber
 
 
 - Confussion matrik
+  
 ![confussion_matrik](https://github.com/user-attachments/assets/fa22d81d-f4a1-4d9d-81a3-8de84fd565ae)
 
 **Intepretasi**
