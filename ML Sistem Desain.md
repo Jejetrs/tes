@@ -234,11 +234,11 @@ Dengan kombinasi metrik tersebut, evaluasi model menjadi lebih komprehensif, ber
 **Hasil Evaluasi Model**
 - Akurasi
   
- | Dataset    | Akurasi   |
- |------------|-----------|
- | Pelatihan  | 99.58%    |
- | Validasi   | 98.33%    |
- | Pengujian  | 98.33%    |
+  | Dataset    | Akurasi   |
+  |------------|-----------|
+  | Pelatihan  | 99.58%    |
+  | Validasi   | 98.33%    |
+  | Pengujian  | 98.33%    |
 
 - Grafik akurasi
   
