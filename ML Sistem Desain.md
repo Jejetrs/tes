@@ -250,19 +250,19 @@ Dengan kombinasi metrik tersebut, evaluasi model menjadi lebih komprehensif, ber
 
 - Classification Report
 
- | Kelas              | Precision | Recall | F1-Score | Support |
- |--------------------|-----------|--------|----------|---------|
- | Dry                | 0.98      | 1.00   | 0.99     | 60      |
- | Normal             | 0.97      | 1.00   | 0.98     | 60      |
- | Oily               | 1.00      | 0.95   | 0.97     | 60      |
- | **Akurasi**        |           |        | **0.98** | 180     |
- | **Rata-rata Macro**| 0.98      | 0.98   | 0.98     | 180     |
- | **Rata-rata Weighted** | 0.98  | 0.98   | 0.98     | 180     |
+  | Kelas              | Precision | Recall | F1-Score | Support |
+  |--------------------|-----------|--------|----------|---------|
+  | Dry                | 0.98      | 1.00   | 0.99     | 60      |
+  | Normal             | 0.97      | 1.00   | 0.98     | 60      |
+  | Oily               | 1.00      | 0.95   | 0.97     | 60      |
+  | **Akurasi**        |           |        | **0.98** | 180     |
+  | **Rata-rata Macro**| 0.98      | 0.98   | 0.98     | 180     |
+  | **Rata-rata Weighted** | 0.98  | 0.98   | 0.98     | 180     |
 
 
 - Confussion matrik
   
- ![confussion_matrik](https://github.com/user-attachments/assets/fa22d81d-f4a1-4d9d-81a3-8de84fd565ae)
+  ![confussion_matrik](https://github.com/user-attachments/assets/fa22d81d-f4a1-4d9d-81a3-8de84fd565ae)
 
 **Intepretasi**
 - Akurasi tinggi secara konsisten menunjukkan proses pelatihan yang sukses dan minim overfitting.
